@@ -1,12 +1,15 @@
 ﻿using HospitalWebAPI.Contexts;
 using HospitalWebAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace HospitalWebAPI.Controllers
 {
+	[Authorize]
+	[ApiController]
 	[Route("/DataRetrievalController")]
-	[ApiExplorerSettings(GroupName = "v1")]
+	//[ApiExplorerSettings(GroupName = "v1")]
 	public class DataRetrievalController : Controller
 	{
 		/// <summary>

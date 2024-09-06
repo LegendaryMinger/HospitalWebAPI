@@ -1,12 +1,17 @@
 ﻿using HospitalWebAPI.Common;
 using HospitalWebAPI.Contexts;
 using HospitalWebAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace HospitalWebAPI.Controllers
 {
 	[Route("/UserController")]
-	[ApiExplorerSettings(GroupName = "v2")]
+	//[ApiExplorerSettings(GroupName = "v2")]
 	public class UserController : Controller
 	{
 		/// <summary>
@@ -18,20 +23,21 @@ namespace HospitalWebAPI.Controllers
 		/// <remarks>Запрос для авторизации при помощи логина и пароля</remarks>
 		[Route("Login")]
 		[HttpPost]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(401)]
 		[ProducesResponseType(500)]
 		public IActionResult Login(string Login, string Password)
 		{
 			try
 			{
+				if (Login == null || Password == null)
+					return BadRequest();
 				using (var context = new HospitalContext())
 				{
 					if (context.User.Any(user => user.Login == EncryptData.GetMD5Hash(Login) && user.Password == EncryptData.GetMD5Hash(Password)))
 					{
-						return StatusCode(200);
+						var authToken = TokenService.GenerateToken(Login);
+						return Ok(new {Token = authToken});
 					}
-					return StatusCode(401);
+					return Unauthorized();
 				}
 			}
 			catch
@@ -56,6 +62,8 @@ namespace HospitalWebAPI.Controllers
 		{
 			try
 			{
+				if (Login == null || Password == null || ConfirmPassword == null)
+					return BadRequest();
 				if (Password != ConfirmPassword)
 					return StatusCode(409);
 				using (var context = new HospitalContext())
