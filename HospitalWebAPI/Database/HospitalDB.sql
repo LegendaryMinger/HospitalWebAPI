@@ -394,6 +394,31 @@ LOCK TABLES `service` WRITE;
 INSERT INTO `service` VALUES (1,1,'Прием хирурга',1000),(2,2,'Пломбирование зуба',1500),(3,3,'Прием невролога',1200),(4,4,'Анализ крови',500),(5,5,'Прием травматолога',800);
 /*!40000 ALTER TABLE `service` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `Login` varchar(100) DEFAULT NULL,
+  `Password` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'098f6bcd4621d373cade4e832627b4f6','098f6bcd4621d373cade4e832627b4f6');
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -404,4 +429,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-06  1:03:58
+-- Dump completed on 2024-09-06 14:05:21
