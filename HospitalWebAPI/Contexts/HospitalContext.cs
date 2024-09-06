@@ -18,6 +18,7 @@ namespace HospitalWebAPI.Contexts
 		public DbSet<Patient> Patient { get; set; }
 		public DbSet<Payment> Payment { get; set; }
 		public DbSet<Service> Service { get; set; }
+		public DbSet<User> User { get; set; }
 		public HospitalContext() { }
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{

@@ -6,6 +6,7 @@ using System.Net;
 namespace HospitalWebAPI.Controllers
 {
 	[Route("/DataRetrievalController")]
+	[ApiExplorerSettings(GroupName = "v1")]
 	public class DataRetrievalController : Controller
 	{
 		/// <summary>
