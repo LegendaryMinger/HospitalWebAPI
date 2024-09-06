@@ -5,6 +5,7 @@ namespace HospitalWebAPI.Contexts
 {
 	public class HospitalContext : DbContext
 	{
+		public HospitalContext(DbContextOptions<HospitalContext> options) : base(options) { }
 		public DbSet<Appointment> Appointment { get; set; }
 		public DbSet<AppointmentDisease> AppointmentDisease { get; set; }
 		public DbSet<Comment> Comment { get; set; }
@@ -19,10 +20,5 @@ namespace HospitalWebAPI.Contexts
 		public DbSet<Payment> Payment { get; set; }
 		public DbSet<Service> Service { get; set; }
 		public DbSet<User> User { get; set; }
-		public HospitalContext() { }
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-			optionsBuilder.UseMySql("server=127.0.0.1;uid=root;pwd=root;database=hospital", new MySqlServerVersion(new Version(8, 0, 11)));
-		}
 	}
 }

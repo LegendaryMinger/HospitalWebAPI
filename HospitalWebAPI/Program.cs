@@ -1,6 +1,8 @@
 using HospitalWebAPI.Common;
+using HospitalWebAPI.Contexts;
 using HospitalWebAPI.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,9 +10,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMvc(option => option.EnableEndpointRouting = true);
+var connectionSting = builder.Configuration.GetConnectionString("HospitalDatabase");
 
-//builder.Services.AddControllers();
+builder.Services.AddDbContext<HospitalContext>(options =>
+	options.UseMySql(connectionSting, new MySqlServerVersion(new Version(8, 0, 11))));
+
+builder.Services.AddMvc(option => option.EnableEndpointRouting = true);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -25,8 +30,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenService.JwtKey))
 	};
 });
-
-//builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -72,7 +75,6 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 
 app.UseStatusCodePages();
-
 
 app.UseSwagger();
 

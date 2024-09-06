@@ -10,7 +10,7 @@ namespace HospitalWebAPI.Common
 		public const string JwtKey = "c93624fe39530ce8e5b18950d61015e13d5393696263dae942f130afced6c419";
 		public const string JwtIssuer = "https://domainfortoken.com";
 		public const string JwtAudience = "https://domainfortoken.com";
-		public static string GenerateToken(string Login)
+		public static string GenerateToken(string login)
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var key = Encoding.ASCII.GetBytes(JwtKey);
@@ -18,7 +18,7 @@ namespace HospitalWebAPI.Common
 			{
 				Subject = new ClaimsIdentity(new Claim[]
 				{
-				new Claim(ClaimTypes.Name, Login)
+				new Claim(ClaimTypes.Name, login)
 				}),
 				Expires = DateTime.UtcNow.AddHours(1),
 				Issuer = JwtIssuer,

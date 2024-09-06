@@ -2,6 +2,7 @@
 using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace HospitalWebAPI.Controllers
@@ -12,23 +13,24 @@ namespace HospitalWebAPI.Controllers
 	//[ApiExplorerSettings(GroupName = "v1")]
 	public class DataRetrievalController : Controller
 	{
+		private readonly HospitalContext _context;
+		public DataRetrievalController(HospitalContext context)
+		{
+			_context = context;
+		}
 		/// <summary>
 		/// Список записей на прием
 		/// </summary>
 		/// <remarks>Запрос для получения списка записей на прием</remarks>
-		[Route("Appointment")]
-		[HttpGet]
+		[HttpGet("Appointment")]
 		[ProducesResponseType(typeof(List<Appointment>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult AppointmentList()
+		public async Task<ActionResult> AppointmentList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Appointment> AppointmentList = context.Appointment.ToList();
-					return Json(AppointmentList);
-				}
+				var appointmentList = await _context.Appointment.ToListAsync();
+				return Json(appointmentList);
 			}
 			catch
 			{
@@ -39,19 +41,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список данных из AppointmentDisease
 		/// </summary>
 		/// <remarks>Запрос для получения списка из сущности, которая связывает между собой Appointment и Disease</remarks>
-		[Route("AppointmentDisease")]
-		[HttpGet]
+		[HttpGet("AppointmentDisease")]
 		[ProducesResponseType(typeof(List<AppointmentDisease>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult AppointmentDiseaseList()
+		public async Task<ActionResult> AppointmentDiseaseList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<AppointmentDisease> AppointmentDiseaseList = context.AppointmentDisease.ToList();
-					return Json(AppointmentDiseaseList);
-				}
+				var appointmentDiseaseList = await _context.AppointmentDisease.ToListAsync();
+				return Json(appointmentDiseaseList);
 			}
 			catch
 			{
@@ -62,19 +60,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список комментариев
 		/// </summary>
 		/// <remarks>Запрос для получения списка комментариев</remarks>
-		[Route("Comment")]
-		[HttpGet]
+		[HttpGet("Comment")]
 		[ProducesResponseType(typeof(List<Comment>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult CommentList()
+		public async Task<ActionResult> CommentList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Comment> CommentList = context.Comment.ToList();
-					return Json(CommentList);
-				}
+				var commentList = await _context.Comment.ToListAsync();
+				return Json(commentList);
 			}
 			catch
 			{
@@ -85,19 +79,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список отделений
 		/// </summary>
 		/// <remarks>Запрос для получения списка отделений</remarks>
-		[Route("Department")]
-		[HttpGet]
+		[HttpGet("Department")]
 		[ProducesResponseType(typeof(List<Department>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult DepartmentList()
+		public async Task<ActionResult> DepartmentList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Department> DepartmentList = context.Department.ToList();
-					return Json(DepartmentList);
-				}
+				var departmentList = await _context.Department.ToListAsync();
+				return Json(departmentList);
 			}
 			catch
 			{
@@ -108,19 +98,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список болезней
 		/// </summary>
 		/// <remarks>Запрос для получения списка болезней</remarks>
-		[Route("Disease")]
-		[HttpGet]
+		[HttpGet("Disease")]
 		[ProducesResponseType(typeof(List<Disease>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult DiseaseList()
+		public async Task<ActionResult> DiseaseList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Disease> DiseaseList = context.Disease.ToList();
-					return Json(DiseaseList);
-				}
+				var diseaseList = await _context.Disease.ToListAsync();
+				return Json(diseaseList);
 			}
 			catch
 			{
@@ -131,19 +117,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список сотрудников
 		/// </summary>
 		/// <remarks>Запрос для получения списка сотрудников</remarks>
-		[Route("Employee")]
-		[HttpGet]
+		[HttpGet("Employee")]
 		[ProducesResponseType(typeof(List<Employee>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult EmployeeList()
+		public async Task<ActionResult> EmployeeList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Employee> EmployeeList = context.Employee.ToList();
-					return Json(EmployeeList);
-				}
+				var employeeList = await _context.Employee.ToListAsync();
+				return Json(employeeList);
 			}
 			catch
 			{
@@ -154,19 +136,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список оборудования
 		/// </summary>
 		/// <remarks>Запрос для получения списка оборудования</remarks>
-		[Route("Equipment")]
-		[HttpGet]
+		[HttpGet("Equipment")]
 		[ProducesResponseType(typeof(List<Equipment>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult EquipmentList()
+		public async Task<ActionResult> EquipmentList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Equipment> EquipmentList = context.Equipment.ToList();
-					return Json(EquipmentList);
-				}
+				var equipmentList = await _context.Equipment.ToListAsync();
+				return Json(equipmentList);
 			}
 			catch
 			{
@@ -177,19 +155,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список полов
 		/// </summary>
 		/// <remarks>Запрос для получения списка полов</remarks>
-		[Route("Gender")]
-		[HttpGet]
+		[HttpGet("Gender")]
 		[ProducesResponseType(typeof(List<Gender>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult GenderList()
+		public async Task<ActionResult> GenderList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Gender> GenderList = context.Gender.ToList();
-					return Json(GenderList);
-				}
+				var genderList = await _context.Gender.ToListAsync();
+				return Json(genderList);
 			}
 			catch
 			{
@@ -200,19 +174,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список историй болезни
 		/// </summary>
 		/// <remarks>Запрос для получения списка историй болезни</remarks>
-		[Route("History")]
-		[HttpGet]
+		[HttpGet("History")]
 		[ProducesResponseType(typeof(List<History>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult HistoryList()
+		public async Task<ActionResult> HistoryList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<History> HistoryList = context.History.ToList();
-					return Json(HistoryList);
-				}
+				var historyList = await _context.History.ToListAsync();
+				return Json(historyList);
 			}
 			catch
 			{
@@ -223,19 +193,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список медицинских инструкций
 		/// </summary>
 		/// <remarks>Запрос для получения списка медицинских инструкций</remarks>
-		[Route("Instruction")]
-		[HttpGet]
+		[HttpGet("Instruction")]
 		[ProducesResponseType(typeof(List<Instruction>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult InstructionList()
+		public async Task<ActionResult> InstructionList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Instruction> InstructionList = context.Instruction.ToList();
-					return Json(InstructionList);
-				}
+				var instructionList = await _context.Instruction.ToListAsync();
+				return Json(instructionList);
 			}
 			catch
 			{
@@ -246,19 +212,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список пациентов
 		/// </summary>
 		/// <remarks>Запрос для получения списка пациентов</remarks>
-		[Route("Patient")]
-		[HttpGet]
+		[HttpGet("Patient")]
 		[ProducesResponseType(typeof(List<Patient>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult PatientList()
+		public async Task<ActionResult> PatientList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Patient> PatientList = context.Patient.ToList();
-					return Json(PatientList);
-				}
+				var patientList = await _context.Patient.ToListAsync();
+				return Json(patientList);
 			}
 			catch
 			{
@@ -273,15 +235,12 @@ namespace HospitalWebAPI.Controllers
 		[HttpGet]
 		[ProducesResponseType(typeof(List<Payment>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult PaymentList()
+		public async Task<ActionResult> PaymentList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Payment> PaymentList = context.Payment.ToList();
-					return Json(PaymentList);
-				}
+				var paymentList = await _context.Payment.ToListAsync();
+				return Json(paymentList);
 			}
 			catch
 			{
@@ -292,19 +251,15 @@ namespace HospitalWebAPI.Controllers
 		/// Список услуг
 		/// </summary>
 		/// <remarks>Запрос для получения списка услуг</remarks>
-		[Route("Service")]
-		[HttpGet]
+		[HttpGet("Service")]
 		[ProducesResponseType(typeof(List<Service>), 200)]
 		[ProducesResponseType(500)]
-		public ActionResult ServiceList()
+		public async Task<ActionResult> ServiceList()
 		{
 			try
 			{
-				using (var context = new HospitalContext())
-				{
-					IEnumerable<Service> ServiceList = context.Service.ToList();
-					return Json(ServiceList);
-				}
+				var serviceList = await _context.Service.ToListAsync();
+				return Json(serviceList);
 			}
 			catch
 			{
