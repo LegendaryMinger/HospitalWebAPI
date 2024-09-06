@@ -1,6 +1,8 @@
+using HospitalWebAPI.Classes;
 using HospitalWebAPI.Common;
 using HospitalWebAPI.Contexts;
 using HospitalWebAPI.Controllers;
+using HospitalWebAPI.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -17,17 +19,22 @@ builder.Services.AddDbContext<HospitalContext>(options =>
 
 builder.Services.AddMvc(option => option.EnableEndpointRouting = true);
 
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
+	var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtConfig>();
 	options.TokenValidationParameters = new TokenValidationParameters
 	{
 		ValidateIssuer = true,
 		ValidateAudience = true,
 		ValidateLifetime = true,
 		ValidateIssuerSigningKey = true,
-		ValidIssuer = TokenService.JwtIssuer,
-		ValidAudience = TokenService.JwtAudience,
-		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenService.JwtKey))
+		ValidIssuer = jwtConfig.Issuer,
+		ValidAudience = jwtConfig.Audience,
+		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key))
 	};
 });
 

@@ -1,7 +1,9 @@
 ﻿using HospitalWebAPI.Common;
 using HospitalWebAPI.Contexts;
+using HospitalWebAPI.Interfaces;
 using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,9 +18,11 @@ namespace HospitalWebAPI.Controllers
 	public class UserController : Controller
 	{
 		private readonly HospitalContext _context;
-		public UserController(HospitalContext context)
+		private readonly ITokenService _tokenService;
+		public UserController(HospitalContext context, ITokenService tokenService)
 		{
 			_context = context;
+			_tokenService = tokenService;
 		}
 
 		/// <summary>
@@ -36,10 +40,15 @@ namespace HospitalWebAPI.Controllers
 			{
 				if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
 					return BadRequest();
-				if (await _context.User.AnyAsync(user => user.Login == EncryptData.GetMD5Hash(login) && user.Password == EncryptData.GetMD5Hash(password)))
+				var user = await _context.User.SingleOrDefaultAsync(user => user.Login == login);
+				if (user == null)
+					return Unauthorized();
+				var passwordHasher = new PasswordHasher<User>();
+				var authResult = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+				if (authResult == PasswordVerificationResult.Success)
 				{
-					var authToken = TokenService.GenerateToken(login);
-					return Ok(new { Token = authToken });
+					var authToken = _tokenService.GenerateToken(login);
+					return Ok(new {Token = authToken});
 				}
 				return Unauthorized();
 			}
@@ -68,9 +77,11 @@ namespace HospitalWebAPI.Controllers
 					return BadRequest();
 				if (password != confirmPassword)
 					return StatusCode(409);
-				if (!await _context.User.AnyAsync(user => user.Login == EncryptData.GetMD5Hash(login)))
+				if (!await _context.User.AnyAsync(user => user.Login == login))
 				{
-					User newUser = new User(EncryptData.GetMD5Hash(login), EncryptData.GetMD5Hash(password));
+					var passwordHasher = new PasswordHasher<User>();
+					var hashedPassword = passwordHasher.HashPassword(null, password);
+					User newUser = new User { Login = login, Password = hashedPassword };
 					_context.User.Add(newUser);
 					await _context.SaveChangesAsync();
 					return Json(newUser);
