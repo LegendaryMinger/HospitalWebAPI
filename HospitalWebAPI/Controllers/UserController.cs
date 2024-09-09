@@ -1,4 +1,4 @@
-﻿using HospitalWebAPI.Common;
+﻿using HospitalWebAPI.Services;
 using HospitalWebAPI.Contexts;
 using HospitalWebAPI.Interfaces;
 using HospitalWebAPI.Models;
@@ -13,18 +13,15 @@ using System.Text;
 
 namespace HospitalWebAPI.Controllers
 {
-	[Route("/UserController")]
-	//[ApiExplorerSettings(GroupName = "v2")]
+	[ApiController]
+	[Route("/[controller]")]
 	public class UserController : Controller
 	{
-		private readonly HospitalContext _context;
-		private readonly ITokenService _tokenService;
-		public UserController(HospitalContext context, ITokenService tokenService)
+		private readonly IUserService _userService;
+		public UserController(IUserService userService)
 		{
-			_context = context;
-			_tokenService = tokenService;
+			_userService = userService;
 		}
-
 		/// <summary>
 		/// Авторизация
 		/// </summary>
@@ -38,23 +35,12 @@ namespace HospitalWebAPI.Controllers
 		{
 			try
 			{
-				if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
-					return BadRequest();
-				var user = await _context.User.SingleOrDefaultAsync(user => user.Login == login);
-				if (user == null)
-					return Unauthorized();
-				var passwordHasher = new PasswordHasher<User>();
-				var authResult = passwordHasher.VerifyHashedPassword(user, user.Password, password);
-				if (authResult == PasswordVerificationResult.Success)
-				{
-					var authToken = _tokenService.GenerateToken(login);
-					return Ok(new {Token = authToken});
-				}
-				return Unauthorized();
+				var token = await _userService.LoginAsync(login, password);
+				return Ok(new { Token = token });
 			}
-			catch
+			catch (Exception ex)
 			{
-				return StatusCode(500);
+				return Unauthorized(ex.Message);
 			}
 		}
 		/// <summary>
@@ -73,24 +59,12 @@ namespace HospitalWebAPI.Controllers
 		{
 			try
 			{
-				if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword))
-					return BadRequest();
-				if (password != confirmPassword)
-					return StatusCode(409);
-				if (!await _context.User.AnyAsync(user => user.Login == login))
-				{
-					var passwordHasher = new PasswordHasher<User>();
-					var hashedPassword = passwordHasher.HashPassword(null, password);
-					User newUser = new User { Login = login, Password = hashedPassword };
-					_context.User.Add(newUser);
-					await _context.SaveChangesAsync();
-					return Json(newUser);
-				}
-				return StatusCode(409);
+				var registeredUser = await _userService.RegistrationAsync(login, password, confirmPassword);
+				return Ok(registeredUser);
 			}
-			catch
+			catch (Exception ex)
 			{
-				return StatusCode(500);
+				return BadRequest(ex.Message);
 			}
 		}
 	}

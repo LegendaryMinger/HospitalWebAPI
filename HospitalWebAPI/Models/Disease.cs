@@ -20,6 +20,6 @@
 		/// <summary>
 		/// Медицинские показания к болезни
 		/// </summary>
-		public string Indicators { get; set; }
+		public string Indications { get; set; }
 	}
 }
