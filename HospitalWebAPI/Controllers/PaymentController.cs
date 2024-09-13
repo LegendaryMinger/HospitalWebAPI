@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список платежей
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка платежей</remarks>
-		[HttpGet(nameof(GetPayments))]
-		public async Task<ActionResult> GetPayments()
+		[HttpGet(nameof(GetPaymentsAsync))]
+		public async Task<ActionResult> GetPaymentsAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var payments = await _paymentService.GetAllAsync();
-				return Ok(payments);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var payments = await _paymentService.GetAllAsync(cancellationToken);
+			return Ok(payments);
 		}
 		/// <summary>
 		/// Платеж
 		/// </summary>
 		/// <param name="id">Id платежа</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения платежа по Id</remarks>
-		[HttpGet(nameof(GetPaymentById))]
-		public async Task<ActionResult> GetPaymentById(int id)
+		[HttpGet(nameof(GetPaymentByIdAsync))]
+		public async Task<ActionResult> GetPaymentByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var payment = await _paymentService.GetEntryByIdAsync(id);
-				if (payment == null)
-					return NotFound();
-				return Ok(payment);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var payment = await _paymentService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(payment);
 		}
 		/// <summary>
 		/// Создание платежа
 		/// </summary>
 		/// <param name="payment">Платеж</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания платежа</remarks>
-		[HttpPost(nameof(CreatePayment))]
-		public async Task<ActionResult> CreatePayment([FromBody] Payment payment)
+		[HttpPost(nameof(CreatePaymentAsync))]
+		public async Task<ActionResult> CreatePaymentAsync([FromBody] Payment payment, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _paymentService.CreateEntryAsync(payment);
-				return Ok(await _paymentService.GetEntryByIdAsync(payment.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdPayment = await _paymentService.CreateEntryAsync(payment, cancellationToken);
+			return Ok(createdPayment);
 		}
 		/// <summary>
 		/// Обновление платежа
 		/// </summary>
 		/// <param name="id">Id платежа</param>
 		/// <param name="payment">Платеж</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления платежа</remarks>
-		[HttpPut(nameof(UpdatePayment))]
-		public async Task<ActionResult> UpdatePayment(int id, [FromBody] Payment payment)
+		[HttpPut(nameof(UpdatePaymentAsync))]
+		public async Task<ActionResult> UpdatePaymentAsync(int id, [FromBody] Payment payment, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != payment.Id)
-					return BadRequest();
-				await _paymentService.UpdateEntryAsync(payment);
-				return Ok(await _paymentService.GetEntryByIdAsync(payment.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedPayment = await _paymentService.UpdateEntryAsync(payment, cancellationToken);
+			return Ok(updatedPayment);
 		}
 		/// <summary>
 		/// Удаление платежа
 		/// </summary>
 		/// <param name="id">Id платежа</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления платежа</remarks>
-		[HttpDelete(nameof(DeletePayment))]
-		public async Task<ActionResult> DeletePayment(int id)
+		[HttpDelete(nameof(DeletePaymentAsync))]
+		public async Task<ActionResult> DeletePaymentAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _paymentService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _paymentService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

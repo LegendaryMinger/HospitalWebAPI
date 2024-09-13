@@ -27,21 +27,15 @@ namespace HospitalWebAPI.Controllers
 		/// </summary>
 		/// <param name="login">Логин</param>
 		/// <param name="password">Пароль</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <returns></returns>
 		/// <remarks>Запрос для авторизации при помощи логина и пароля</remarks>
-		[HttpPost("Login")]
+		[HttpPost(nameof(LoginAsync))]
 		[ProducesResponseType(500)]
-		public async Task<ActionResult> Login(string login, string password)
+		public async Task<ActionResult> LoginAsync(string login, string password, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var token = await _userService.LoginAsync(login, password);
-				return Ok(new { Token = token });
-			}
-			catch (Exception ex)
-			{
-				return Unauthorized(ex.Message);
-			}
+			var token = await _userService.LoginAsync(login, password, cancellationToken);
+			return Ok(new { Token = token });
 		}
 		/// <summary>
 		/// Регистрация
@@ -49,23 +43,17 @@ namespace HospitalWebAPI.Controllers
 		/// <param name="login">Логин</param>
 		/// <param name="password">Пароль</param>
 		/// <param name="confirmPassword">Подтверждение пароля</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <returns></returns>
 		/// <remarks>Запрос для регистрации при помощи логина, пароля и подтверждения пароля</remarks>
-		[HttpPost("Registration")]
+		[HttpPost(nameof(RegistrationAsync))]
 		[ProducesResponseType(typeof(User), 200)]
 		[ProducesResponseType(409)]
 		[ProducesResponseType(500)]
-		public async Task<ActionResult> Registration(string login, string password, string confirmPassword)
+		public async Task<ActionResult> RegistrationAsync(string login, string password, string confirmPassword, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var registeredUser = await _userService.RegistrationAsync(login, password, confirmPassword);
-				return Ok(registeredUser);
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
+			var registeredUser = await _userService.RegistrationAsync(login, password, confirmPassword, cancellationToken);
+			return Ok(registeredUser);
 		}
 	}
 }

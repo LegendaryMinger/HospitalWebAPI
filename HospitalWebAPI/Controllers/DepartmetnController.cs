@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список отделений
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка отделений</remarks>
-		[HttpGet(nameof(GetDepartments))]
-		public async Task<ActionResult> GetDepartments()
+		[HttpGet(nameof(GetDepartmentsAsync))]
+		public async Task<ActionResult> GetDepartmentsAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var departments = await _departmentService.GetAllAsync();
-				return Ok(departments);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var departments = await _departmentService.GetAllAsync(cancellationToken);
+			return Ok(departments);
 		}
 		/// <summary>
 		/// Отделение
 		/// </summary>
 		/// <param name="id">Id отделения</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения отделения по Id</remarks>
-		[HttpGet(nameof(GetDepartmentById))]
-		public async Task<ActionResult> GetDepartmentById(int id)
+		[HttpGet(nameof(GetDepartmentByIdAsync))]
+		public async Task<ActionResult> GetDepartmentByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var department = await _departmentService.GetEntryByIdAsync(id);
-				if (department == null)
-					return NotFound();
-				return Ok(department);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var department = await _departmentService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(department);
 		}
 		/// <summary>
 		/// Создание отделения
 		/// </summary>
 		/// <param name="department">Запись на прием</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания отделения</remarks>
-		[HttpPost(nameof(CreateDepartment))]
-		public async Task<ActionResult> CreateDepartment([FromBody] Department department)
+		[HttpPost(nameof(CreateDepartmentAsync))]
+		public async Task<ActionResult> CreateDepartmentAsync([FromBody] Department department, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _departmentService.CreateEntryAsync(department);
-				return Ok(await _departmentService.GetEntryByIdAsync(department.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdDepartment = await _departmentService.CreateEntryAsync(department, cancellationToken);
+			return Ok(createdDepartment);
 		}
 		/// <summary>
 		/// Обновление отделения
 		/// </summary>
 		/// <param name="id">Id отделения</param>
 		/// <param name="department">Запись на прием</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления отделения</remarks>
-		[HttpPut(nameof(UpdateDepartment))]
-		public async Task<ActionResult> UpdateDepartment(int id, [FromBody] Department department)
+		[HttpPut(nameof(UpdateDepartmentAsync))]
+		public async Task<ActionResult> UpdateDepartmentAsync(int id, [FromBody] Department department, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != department.Id)
-					return BadRequest();
-				await _departmentService.UpdateEntryAsync(department);
-				return Ok(await _departmentService.GetEntryByIdAsync(department.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedDepartment = await _departmentService.UpdateEntryAsync(department, cancellationToken);
+			return Ok(updatedDepartment);
 		}
 		/// <summary>
 		/// Удаление отделения
 		/// </summary>
 		/// <param name="id">Id отделения</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления отделения</remarks>
-		[HttpDelete(nameof(DeleteDepartment))]
-		public async Task<ActionResult> DeleteDepartment(int id)
+		[HttpDelete(nameof(DeleteDepartmentAsync))]
+		public async Task<ActionResult> DeleteDepartmentAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _departmentService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _departmentService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

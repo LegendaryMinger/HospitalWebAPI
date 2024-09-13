@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список оборудования
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка оборудования</remarks>
-		[HttpGet(nameof(GetAllEquipment))]
-		public async Task<ActionResult> GetAllEquipment()
+		[HttpGet(nameof(GetAllEquipmentAsync))]
+		public async Task<ActionResult> GetAllEquipmentAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var allEquipment = await _equipmentService.GetAllAsync();
-				return Ok(allEquipment);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var allEquipment = await _equipmentService.GetAllAsync(cancellationToken);
+			return Ok(allEquipment);
 		}
 		/// <summary>
 		/// Оборудование
 		/// </summary>
 		/// <param name="id">Id оборудования</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения оборудования по Id</remarks>
-		[HttpGet(nameof(GetEquipmentById))]
-		public async Task<ActionResult> GetEquipmentById(int id)
+		[HttpGet(nameof(GetEquipmentByIdAsync))]
+		public async Task<ActionResult> GetEquipmentByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var equipment = await _equipmentService.GetEntryByIdAsync(id);
-				if (equipment == null)
-					return NotFound();
-				return Ok(equipment);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var equipment = await _equipmentService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(equipment);
 		}
 		/// <summary>
 		/// Создание оборудования
 		/// </summary>
 		/// <param name="equipment">Оборудование</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания оборудования</remarks>
-		[HttpPost(nameof(CreateEquipment))]
-		public async Task<ActionResult> CreateEquipment([FromBody] Equipment equipment)
+		[HttpPost(nameof(CreateEquipmentAsync))]
+		public async Task<ActionResult> CreateEquipmentAsync([FromBody] Equipment equipment, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _equipmentService.CreateEntryAsync(equipment);
-				return Ok(await _equipmentService.GetEntryByIdAsync(equipment.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdEquipment = await _equipmentService.CreateEntryAsync(equipment, cancellationToken);
+			return Ok(createdEquipment);
 		}
 		/// <summary>
 		/// Обновление оборудования
 		/// </summary>
 		/// <param name="id">Id оборудования</param>
 		/// <param name="equipment">Оборудование</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления оборудования</remarks>
-		[HttpPut(nameof(UpdateEquipment))]
-		public async Task<ActionResult> UpdateEquipment(int id, [FromBody] Equipment equipment)
+		[HttpPut(nameof(UpdateEquipmentAsync))]
+		public async Task<ActionResult> UpdateEquipmentAsync(int id, [FromBody] Equipment equipment, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != equipment.Id)
-					return BadRequest();
-				await _equipmentService.UpdateEntryAsync(equipment);
-				return Ok(await _equipmentService.GetEntryByIdAsync(equipment.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedEquipment = await _equipmentService.UpdateEntryAsync(equipment, cancellationToken);
+			return Ok(updatedEquipment);
 		}
 		/// <summary>
 		/// Удаление оборудования
 		/// </summary>
 		/// <param name="id">Id оборудования</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления оборудования</remarks>
-		[HttpDelete(nameof(DeleteEquipment))]
-		public async Task<ActionResult> DeleteEquipment(int id)
+		[HttpDelete(nameof(DeleteEquipmentAsync))]
+		public async Task<ActionResult> DeleteEquipmentAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _equipmentService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _equipmentService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

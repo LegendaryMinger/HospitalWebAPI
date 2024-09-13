@@ -10,6 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using HospitalWebAPI.Models;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using HospitalWebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,19 +31,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.Services.AddScoped<IGenericService<Appointment>, GenericService<Appointment>>();
-builder.Services.AddScoped<IGenericService<AppointmentDisease>, GenericService<AppointmentDisease>>();
-builder.Services.AddScoped<IGenericService<Comment>, GenericService<Comment>>();
-builder.Services.AddScoped<IGenericService<Department>, GenericService<Department>>();
-builder.Services.AddScoped<IGenericService<Disease>, GenericService<Disease>>();
-builder.Services.AddScoped<IGenericService<Employee>, GenericService<Employee>>();
-builder.Services.AddScoped<IGenericService<Equipment>, GenericService<Equipment>>();
-builder.Services.AddScoped<IGenericService<Gender>, GenericService<Gender>>();
-builder.Services.AddScoped<IGenericService<History>, GenericService<History>>();
-builder.Services.AddScoped<IGenericService<Instruction>, GenericService<Instruction>>();
-builder.Services.AddScoped<IGenericService<Patient>, GenericService<Patient>>();
-builder.Services.AddScoped<IGenericService<Payment>, GenericService<Payment>>();
-builder.Services.AddScoped<IGenericService<Service>, GenericService<Service>>();
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -56,6 +47,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key))
 	};
 });
+
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -168,29 +161,20 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-app.UseDeveloperExceptionPage();
+var swaggerEndpoints = builder.Configuration.GetSection("Swagger:Endpoints").Get<List<EndpointsConfig>>();
 
-app.UseStatusCodePages();
-
-app.UseSwagger();
-
-app.UseSwaggerUI(c =>
+if (swaggerEndpoints != null)
 {
-	c.SwaggerEndpoint("/swagger/appointments/swagger.json", "Appointments (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/appointmentDiseases/swagger.json", "AppointmentDiseases (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/comments/swagger.json", "Comments (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/departments/swagger.json", "Departments (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/diseases/swagger.json", "Diseases (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/employees/swagger.json", "Employees (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/equipment/swagger.json", "Equipment (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/genders/swagger.json", "Genders (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/histories/swagger.json", "Histories (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/instructions/swagger.json", "Instructions (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/patients/swagger.json", "Patients (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/payments/swagger.json", "Payments (CRUD Requests)");
-	c.SwaggerEndpoint("/swagger/services/swagger.json", "Services (CRUD Requests)");
-	c.RoutePrefix = String.Empty;
-});
+	app.UseSwagger();
+	app.UseSwaggerUI(c =>
+	{
+		foreach (var endpoint in swaggerEndpoints)
+			c.SwaggerEndpoint(endpoint.Url, endpoint.Description);
+		c.RoutePrefix = String.Empty;
+	});
+}
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseRouting();
 

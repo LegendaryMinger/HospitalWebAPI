@@ -3,6 +3,7 @@ using HospitalWebAPI.Interfaces;
 using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security;
 
 namespace HospitalWebAPI.Services
 {
@@ -15,39 +16,73 @@ namespace HospitalWebAPI.Services
 			_context = context;
 			_tokenService = tokenService;
 		}
-		public async Task<string> LoginAsync(string login, string password)
+		public async Task<string> LoginAsync(string login, string password, CancellationToken cancellationToken)
 		{
-			var authUser = await _context.User.SingleOrDefaultAsync(user => user.Login == login);
-			if (authUser == null)
+			if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+				throw new ArgumentNullException();
+
+			try
 			{
-				throw new Exception("Invalid login or password");
+				var authUser = await _context.User.SingleOrDefaultAsync(user => user.Login == login);
+				if (authUser == null)
+					throw new UnauthorizedAccessException();
+
+				var passwordHasher = new PasswordHasher<User>();
+				var authResult = passwordHasher.VerifyHashedPassword(authUser, authUser.Password, password);
+
+				if (authResult != PasswordVerificationResult.Success)
+					throw new UnauthorizedAccessException();
+
+				var authToken = _tokenService.GenerateToken(login);
+				return authToken;
 			}
-			var passwordHasher = new PasswordHasher<User>();
-			var authResult = passwordHasher.VerifyHashedPassword(authUser, authUser.Password, password);
-			if (authResult != PasswordVerificationResult.Success)
+			catch (UnauthorizedAccessException ex)
 			{
-				throw new Exception("Invalid login or password");
+				throw new UnauthorizedAccessException();
 			}
-			var authToken = _tokenService.GenerateToken(login);
-			return authToken;
+			catch (Exception ex)
+			{
+				throw new Exception();
+			}
 		}
-		public async Task<User> RegistrationAsync(string login, string password, string confirmPassword)
+		public async Task<User> RegistrationAsync(string login, string password, string confirmPassword, CancellationToken cancellationToken)
 		{
-			if (password != confirmPassword)
+			try
 			{
-				throw new Exception("Password not equals");
+				if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword))
+					throw new ArgumentNullException();
+
+				if (password != confirmPassword)
+					throw new BadHttpRequestException("Bad request");
+
+				var regUser = await _context.User.SingleOrDefaultAsync(u => u.Login == login);
+				if (regUser != null)
+					throw new SecurityException();
+
+				var passwordHasher = new PasswordHasher<User>();
+				var hashedPassword = passwordHasher.HashPassword(null, password);
+				var newUser = new User { Login = login, Password = hashedPassword };
+
+				await _context.AddAsync(newUser);
+				await _context.SaveChangesAsync();
+				return newUser;
 			}
-			var regUser = await _context.User.SingleOrDefaultAsync(u => u.Login == login);
-			if (regUser != null)
+			catch (BadHttpRequestException ex)
 			{
-				throw new Exception("User exists");
+				throw new BadHttpRequestException("Bad request");
 			}
-			var passwordHasher = new PasswordHasher<User>();
-			var hashedPassword = passwordHasher.HashPassword(null, password);
-			var newUser = new User { Login = login, Password = hashedPassword };
-			await _context.AddAsync(newUser);
-			await _context.SaveChangesAsync();
-			return newUser;
+			catch (SecurityException ex)
+			{
+				throw new SecurityException();
+			}
+			catch (ArgumentNullException ex)
+			{
+				throw new ArgumentNullException();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception();
+			}
 		}
 	}
 }

@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список комментариев
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка комментариев</remarks>
-		[HttpGet(nameof(GetComments))]
-		public async Task<ActionResult> GetComments()
+		[HttpGet(nameof(GetCommentsAsync))]
+		public async Task<ActionResult> GetCommentsAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var comments = await _commentService.GetAllAsync();
-				return Ok(comments);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var comments = await _commentService.GetAllAsync(cancellationToken);
+			return Ok(comments);
 		}
 		/// <summary>
 		/// Комментарий
 		/// </summary>
 		/// <param name="id">Id комментария</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения комментария по Id</remarks>
-		[HttpGet(nameof(GetCommentById))]
-		public async Task<ActionResult> GetCommentById(int id)
+		[HttpGet(nameof(GetCommentByIdAsync))]
+		public async Task<ActionResult> GetCommentByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var comment = await _commentService.GetEntryByIdAsync(id);
-				if (comment == null)
-					return NotFound();
-				return Ok(comment);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var comment = await _commentService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(comment);
 		}
 		/// <summary>
 		/// Создание комментария
 		/// </summary>
 		/// <param name="comment">Комментарий</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания комментария</remarks>
-		[HttpPost(nameof(CreateComment))]
-		public async Task<ActionResult> CreateComment([FromBody] Comment comment)
+		[HttpPost(nameof(CreateCommentAsync))]
+		public async Task<ActionResult> CreateCommentAsync([FromBody] Comment comment, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _commentService.CreateEntryAsync(comment);
-				return Ok(await _commentService.GetEntryByIdAsync(comment.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdComment = await _commentService.CreateEntryAsync(comment, cancellationToken);
+			return Ok(createdComment);
 		}
 		/// <summary>
 		/// Обновление комментария
 		/// </summary>
 		/// <param name="id">Id комментария</param>
 		/// <param name="comment">Комментарий</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления комментария</remarks>
-		[HttpPut(nameof(UpdateComment))]
-		public async Task<ActionResult> UpdateComment(int id, [FromBody] Comment comment)
+		[HttpPut(nameof(UpdateCommentAsync))]
+		public async Task<ActionResult> UpdateCommentAsync(int id, [FromBody] Comment comment, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != comment.Id)
-					return BadRequest();
-				await _commentService.UpdateEntryAsync(comment);
-				return Ok(await _commentService.GetEntryByIdAsync(comment.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedComment = await _commentService.UpdateEntryAsync(comment, cancellationToken);
+			return Ok(updatedComment);
 		}
 		/// <summary>
 		/// Удаление комментария
 		/// </summary>
 		/// <param name="id">Id комментария</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления комментария</remarks>
-		[HttpDelete(nameof(DeleteComment))]
-		public async Task<ActionResult> DeleteComment(int id)
+		[HttpDelete(nameof(DeleteCommentAsync))]
+		public async Task<ActionResult> DeleteCommentAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _commentService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _commentService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

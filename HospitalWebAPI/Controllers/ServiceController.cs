@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список услуг
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка услуг</remarks>
-		[HttpGet(nameof(GetServices))]
-		public async Task<ActionResult> GetServices()
+		[HttpGet(nameof(GetServicesAsync))]
+		public async Task<ActionResult> GetServicesAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var services = await _serviceService.GetAllAsync();
-				return Ok(services);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var services = await _serviceService.GetAllAsync(cancellationToken);
+			return Ok(services);
 		}
 		/// <summary>
 		/// Услуга
 		/// </summary>
 		/// <param name="id">Id услуги</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения услуги по Id</remarks>
-		[HttpGet(nameof(GetServiceById))]
-		public async Task<ActionResult> GetServiceById(int id)
+		[HttpGet(nameof(GetServiceByIdAsync))]
+		public async Task<ActionResult> GetServiceByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var service = await _serviceService.GetEntryByIdAsync(id);
-				if (service == null)
-					return NotFound();
-				return Ok(service);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var service = await _serviceService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(service);
 		}
 		/// <summary>
 		/// Создание услуги
 		/// </summary>
 		/// <param name="service">Услуга</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания услуги</remarks>
-		[HttpPost(nameof(CreateService))]
-		public async Task<ActionResult> CreateService([FromBody] Service service)
+		[HttpPost(nameof(CreateServiceAsync))]
+		public async Task<ActionResult> CreateServiceAsync([FromBody] Service service, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _serviceService.CreateEntryAsync(service);
-				return Ok(await _serviceService.GetEntryByIdAsync(service.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdService = await _serviceService.CreateEntryAsync(service, cancellationToken);
+			return Ok(createdService);
 		}
 		/// <summary>
 		/// Обновление услуги
 		/// </summary>
 		/// <param name="id">Id услуги</param>
 		/// <param name="service">Услуга</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления услуги</remarks>
-		[HttpPut(nameof(UpdateService))]
-		public async Task<ActionResult> UpdateService(int id, [FromBody] Service service)
+		[HttpPut(nameof(UpdateServiceAsync))]
+		public async Task<ActionResult> UpdateServiceAsync(int id, [FromBody] Service service, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != service.Id)
-					return BadRequest();
-				await _serviceService.UpdateEntryAsync(service);
-				return Ok(await _serviceService.GetEntryByIdAsync(service.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedService = await _serviceService.UpdateEntryAsync(service, cancellationToken);
+			return Ok(updatedService);
 		}
 		/// <summary>
 		/// Удаление услуги
 		/// </summary>
 		/// <param name="id">Id услуги</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления услуги</remarks>
-		[HttpDelete(nameof(DeleteService))]
-		public async Task<ActionResult> DeleteService(int id)
+		[HttpDelete(nameof(DeleteServiceAsync))]
+		public async Task<ActionResult> DeleteServiceAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _serviceService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _serviceService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

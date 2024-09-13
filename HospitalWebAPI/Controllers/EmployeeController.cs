@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список сотрудников
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка сотрудников</remarks>
-		[HttpGet(nameof(GetEmployees))]
-		public async Task<ActionResult> GetEmployees()
+		[HttpGet(nameof(GetEmployeesAsync))]
+		public async Task<ActionResult> GetEmployeesAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var employees = await _employeeService.GetAllAsync();
-				return Ok(employees);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var employees = await _employeeService.GetAllAsync(cancellationToken);
+			return Ok(employees);
 		}
 		/// <summary>
 		/// Сотрудник
 		/// </summary>
 		/// <param name="id">Id болезни</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения сотрудника по Id</remarks>
-		[HttpGet(nameof(GetEmployeeById))]
-		public async Task<ActionResult> GetEmployeeById(int id)
+		[HttpGet(nameof(GetEmployeeByIdAsync))]
+		public async Task<ActionResult> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var employee = await _employeeService.GetEntryByIdAsync(id);
-				if (employee == null)
-					return NotFound();
-				return Ok(employee);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var employee = await _employeeService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(employee);
 		}
 		/// <summary>
 		/// Создание сотрудника
 		/// </summary>
 		/// <param name="employee">Сотрудник</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания сотрудника</remarks>
-		[HttpPost(nameof(CreateEmployee))]
-		public async Task<ActionResult> CreateEmployee([FromBody] Employee employee)
+		[HttpPost(nameof(CreateEmployeeAsync))]
+		public async Task<ActionResult> CreateEmployeeAsync([FromBody] Employee employee, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _employeeService.CreateEntryAsync(employee);
-				return Ok(await _employeeService.GetEntryByIdAsync(employee.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdEmployee = await _employeeService.CreateEntryAsync(employee, cancellationToken);
+			return Ok(createdEmployee);
 		}
 		/// <summary>
 		/// Обновление сотрудника
 		/// </summary>
 		/// <param name="id">Id сотрудника</param>
 		/// <param name="employee">Сотрудник</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления сотрудника</remarks>
-		[HttpPut(nameof(UpdateEmployee))]
-		public async Task<ActionResult> UpdateEmployee(int id, [FromBody] Employee employee)
+		[HttpPut(nameof(UpdateEmployeeAsync))]
+		public async Task<ActionResult> UpdateEmployeeAsync(int id, [FromBody] Employee employee, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != employee.Id)
-					return BadRequest();
-				await _employeeService.UpdateEntryAsync(employee);
-				return Ok(await _employeeService.GetEntryByIdAsync(employee.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedEmployee = await _employeeService.UpdateEntryAsync(employee, cancellationToken);
+			return Ok(updatedEmployee);
 		}
 		/// <summary>
 		/// Удаление сотрудника
 		/// </summary>
 		/// <param name="id">Id сотрудника</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления сотрудника</remarks>
-		[HttpDelete(nameof(DeleteEmployee))]
-		public async Task<ActionResult> DeleteEmployee(int id)
+		[HttpDelete(nameof(DeleteEmployeeAsync))]
+		public async Task<ActionResult> DeleteEmployeeAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _employeeService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _employeeService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

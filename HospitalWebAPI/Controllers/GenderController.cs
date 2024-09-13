@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список полов
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка полов</remarks>
-		[HttpGet(nameof(GetGenders))]
-		public async Task<ActionResult> GetGenders()
+		[HttpGet(nameof(GetGendersAsync))]
+		public async Task<ActionResult> GetGendersAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var genders = await _genderService.GetAllAsync();
-				return Ok(genders);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var genders = await _genderService.GetAllAsync(cancellationToken);
+			return Ok(genders);
 		}
 		/// <summary>
 		/// Пол
 		/// </summary>
 		/// <param name="id">Id пола</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения пола по Id</remarks>
-		[HttpGet(nameof(GetGenderById))]
-		public async Task<ActionResult> GetGenderById(int id)
+		[HttpGet(nameof(GetGenderByIdAsync))]
+		public async Task<ActionResult> GetGenderByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var gender = await _genderService.GetEntryByIdAsync(id);
-				if (gender == null)
-					return NotFound();
-				return Ok(gender);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var gender = await _genderService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(gender);
 		}
 		/// <summary>
 		/// Создание пола
 		/// </summary>
 		/// <param name="gender">Пол</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания пола</remarks>
-		[HttpPost(nameof(CreateGender))]
-		public async Task<ActionResult> CreateGender([FromBody] Gender gender)
+		[HttpPost(nameof(CreateGenderAsync))]
+		public async Task<ActionResult> CreateGenderAsync([FromBody] Gender gender, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _genderService.CreateEntryAsync(gender);
-				return Ok(await _genderService.GetEntryByIdAsync(gender.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdGender = await _genderService.CreateEntryAsync(gender, cancellationToken);
+			return Ok(createdGender);
 		}
 		/// <summary>
 		/// Обновление пола
 		/// </summary>
 		/// <param name="id">Id пола</param>
 		/// <param name="gender">Пол</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления пола</remarks>
-		[HttpPut(nameof(UpdateGender))]
-		public async Task<ActionResult> UpdateGender(int id, [FromBody] Gender gender)
+		[HttpPut(nameof(UpdateGenderAsync))]
+		public async Task<ActionResult> UpdateGenderAsync(int id, [FromBody] Gender gender, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != gender.Id)
-					return BadRequest();
-				await _genderService.UpdateEntryAsync(gender);
-				return Ok(await _genderService.GetEntryByIdAsync(gender.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedGender = await _genderService.UpdateEntryAsync(gender, cancellationToken);
+			return Ok(updatedGender);
 		}
 		/// <summary>
 		/// Удаление пола
 		/// </summary>
 		/// <param name="id">Id пола</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления пола</remarks>
-		[HttpDelete(nameof(DeleteGender))]
-		public async Task<ActionResult> DeleteGender(int id)
+		[HttpDelete(nameof(DeleteGenderAsync))]
+		public async Task<ActionResult> DeleteGenderAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _genderService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _genderService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

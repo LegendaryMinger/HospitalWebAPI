@@ -1,5 +1,6 @@
 ﻿using HospitalWebAPI.Contexts;
 using HospitalWebAPI.Interfaces;
+using HospitalWebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWebAPI.Services
@@ -13,31 +14,79 @@ namespace HospitalWebAPI.Services
 			_context = context;
 			_dbSet = context.Set<T>();
 		}
-		public async Task<List<T>> GetAllAsync()
+		public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
 		{
-			return await _dbSet.ToListAsync();
-		}
-		public async Task<T> GetEntryByIdAsync(int id)
-		{
-			return await _dbSet.FindAsync(id);
-		}
-		public async Task CreateEntryAsync(T entry)
-		{
-			await _dbSet.AddAsync(entry);
-			await _context.SaveChangesAsync();
-		}
-		public async Task UpdateEntryAsync(T entry)
-		{
-			_dbSet.Update(entry);
-			await _context.SaveChangesAsync();
-		}
-		public async Task DeleteEntryAsync(int id)
-		{
-			var entry = await _dbSet.FindAsync(id);
-			if (entry != null)
+			try
 			{
-				_dbSet.Remove(entry);
+				return await _dbSet.ToListAsync();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception();
+			}
+		}
+		public async Task<T> GetEntryByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			if (id == 0)
+				throw new ArgumentNullException();
+
+			try
+			{
+				return await _dbSet.FindAsync(id);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception();
+			}
+		}
+		public async Task<T> CreateEntryAsync(T entry, CancellationToken cancellationToken)
+		{
+			if (entry == null)
+				throw new ArgumentNullException(nameof(entry));
+
+			try
+			{
+				await _dbSet.AddAsync(entry);
 				await _context.SaveChangesAsync();
+				return entry;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception();
+			}
+		}
+		public async Task<T> UpdateEntryAsync(T entry, CancellationToken cancellationToken)
+		{
+			if (entry == null)
+				throw new ArgumentNullException(nameof(entry));
+
+			try
+			{
+				_dbSet.Update(entry);
+				await _context.SaveChangesAsync();
+				return entry;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception();
+			}
+		}
+		public async Task DeleteEntryAsync(int id, CancellationToken cancellationToken)
+		{
+			if (id == 0)
+				throw new ArgumentNullException();
+
+			try
+			{
+				var entry = Activator.CreateInstance<T>();
+				typeof(T).GetProperty("Id").SetValue(entry, id);
+
+				_dbSet.Entry(entry).State = EntityState.Deleted;
+				await _context.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception();
 			}
 		}
 	}

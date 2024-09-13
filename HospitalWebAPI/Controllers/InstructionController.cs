@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список медицинских инструкций
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка медицинских инструкций</remarks>
-		[HttpGet(nameof(GetInstructions))]
-		public async Task<ActionResult> GetInstructions()
+		[HttpGet(nameof(GetInstructionsAsync))]
+		public async Task<ActionResult> GetInstructionsAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var instructions = await _instructionService.GetAllAsync();
-				return Ok(instructions);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var instructions = await _instructionService.GetAllAsync(cancellationToken);
+			return Ok(instructions);
 		}
 		/// <summary>
 		/// Медицинская инструкция
 		/// </summary>
 		/// <param name="id">Id медицинской инструкции</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения медицинской инструкции по Id</remarks>
-		[HttpGet(nameof(GetInstructionById))]
-		public async Task<ActionResult> GetInstructionById(int id)
+		[HttpGet(nameof(GetInstructionByIdAsync))]
+		public async Task<ActionResult> GetInstructionByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var instruction = await _instructionService.GetEntryByIdAsync(id);
-				if (instruction == null)
-					return NotFound();
-				return Ok(instruction);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var instruction = await _instructionService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(instruction);
 		}
 		/// <summary>
 		/// Создание медицинской инструкции
 		/// </summary>
 		/// <param name="instruction">Медицинская инструкция</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания медицинской инструкции</remarks>
-		[HttpPost(nameof(CreateInstruction))]
-		public async Task<ActionResult> CreateInstruction([FromBody] Instruction instruction)
+		[HttpPost(nameof(CreateInstructionAsync))]
+		public async Task<ActionResult> CreateInstructionAsync([FromBody] Instruction instruction, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _instructionService.CreateEntryAsync(instruction);
-				return Ok(await _instructionService.GetEntryByIdAsync(instruction.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdInstruction = await _instructionService.CreateEntryAsync(instruction, cancellationToken);
+			return Ok(createdInstruction);
 		}
 		/// <summary>
 		/// Обновление медицинской инструкции
 		/// </summary>
 		/// <param name="id">Id медицинской инструкции</param>
 		/// <param name="instruction">Медицинская инструкция</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления медицинской инструкции</remarks>
-		[HttpPut(nameof(UpdateInstruction))]
-		public async Task<ActionResult> UpdateInstruction(int id, [FromBody] Instruction instruction)
+		[HttpPut(nameof(UpdateInstructionAsync))]
+		public async Task<ActionResult> UpdateInstructionAsync(int id, [FromBody] Instruction instruction, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != instruction.Id)
-					return BadRequest();
-				await _instructionService.UpdateEntryAsync(instruction);
-				return Ok(await _instructionService.GetEntryByIdAsync(instruction.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedInstruction = await _instructionService.UpdateEntryAsync(instruction, cancellationToken);
+			return Ok(updatedInstruction);
 		}
 		/// <summary>
 		/// Удаление медицинской инструкции
 		/// </summary>
 		/// <param name="id">Id медицинской инструкции</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления медицинской инструкции</remarks>
-		[HttpDelete(nameof(DeleteInstruction))]
-		public async Task<ActionResult> DeleteInstruction(int id)
+		[HttpDelete(nameof(DeleteInstructionAsync))]
+		public async Task<ActionResult> DeleteInstructionAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _instructionService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _instructionService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }

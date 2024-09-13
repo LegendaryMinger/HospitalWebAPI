@@ -19,96 +19,62 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Список данных из AppointmentDisease
 		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения списка из сущности, которая связывает между собой Appointment и Disease</remarks>
-		[HttpGet(nameof(GetAppointmentDiseases))]
-		public async Task<ActionResult> GetAppointmentDiseases()
+		[HttpGet(nameof(GetAppointmentDiseasesAsync))]
+		public async Task<ActionResult> GetAppointmentDiseasesAsync(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var appointmentDiseases = await _appointmentDiseaseService.GetAllAsync();
-				return Ok(appointmentDiseases);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var appointmentDiseases = await _appointmentDiseaseService.GetAllAsync(cancellationToken);
+			return Ok(appointmentDiseases);
 		}
 		/// <summary>
 		/// Запись из AppointmentDisease
 		/// </summary>
 		/// <param name="id">Id записи из AppointmentDisease</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для получения записи из сущности, которая связывает между собой Appointment и Disease</remarks>
-		[HttpGet(nameof(GetAppointmentDiseaseById))]
-		public async Task<ActionResult> GetAppointmentDiseaseById(int id)
+		[HttpGet(nameof(GetAppointmentDiseaseByIdAsync))]
+		public async Task<ActionResult> GetAppointmentDiseaseByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var appointmentDisease = await _appointmentDiseaseService.GetEntryByIdAsync(id);
-				if (appointmentDisease == null)
-					return NotFound();
-				return Ok(appointmentDisease);
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var appointmentDisease = await _appointmentDiseaseService.GetEntryByIdAsync(id, cancellationToken);
+			return Ok(appointmentDisease);
 		}
 		/// <summary>
 		/// Создание записи из AppointmentDisease
 		/// </summary>
 		/// <param name="appointmentDisease">Запись на прием</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для создания записи из AppointmentDisease</remarks>
-		[HttpPost(nameof(CreateAppointmentDisease))]
-		public async Task<ActionResult> CreateAppointmentDisease([FromBody] AppointmentDisease appointmentDisease)
+		[HttpPost(nameof(CreateAppointmentDiseaseAsync))]
+		public async Task<ActionResult> CreateAppointmentDiseaseAsync([FromBody] AppointmentDisease appointmentDisease, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _appointmentDiseaseService.CreateEntryAsync(appointmentDisease);
-				return Ok(await _appointmentDiseaseService.GetEntryByIdAsync(appointmentDisease.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var createdAppointmentDisease = await _appointmentDiseaseService.CreateEntryAsync(appointmentDisease, cancellationToken);
+			return Ok(createdAppointmentDisease);
 		}
 		/// <summary>
 		/// Обновление записи из AppointmentDisease
 		/// </summary>
 		/// <param name="id">Id записи из AppointmentDisease</param>
 		/// <param name="appointmentDisease">Запись на прием</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления записи из AppointmentDisease</remarks>
-		[HttpPut(nameof(UpdateAppointmentDisease))]
-		public async Task<ActionResult> UpdateAppointmentDisease(int id, [FromBody] AppointmentDisease appointmentDisease)
+		[HttpPut(nameof(UpdateAppointmentDiseaseAsync))]
+		public async Task<ActionResult> UpdateAppointmentDiseaseAsync(int id, [FromBody] AppointmentDisease appointmentDisease, CancellationToken cancellationToken)
 		{
-			try
-			{
-				if (id != appointmentDisease.Id)
-					return BadRequest();
-				await _appointmentDiseaseService.UpdateEntryAsync(appointmentDisease);
-				return Ok(await _appointmentDiseaseService.GetEntryByIdAsync(appointmentDisease.Id));
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			var updatedAppointmentDisease = await _appointmentDiseaseService.UpdateEntryAsync(appointmentDisease, cancellationToken);
+			return Ok(updatedAppointmentDisease);
 		}
 		/// <summary>
 		/// Удаление записи из AppointmentDisease
 		/// </summary>
 		/// <param name="id">Id записи из AppointmentDisease</param>
+		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для удаления записи из AppointmentDisease</remarks>
-		[HttpDelete(nameof(DeleteAppointmentDisease))]
-		public async Task<ActionResult> DeleteAppointmentDisease(int id)
+		[HttpDelete(nameof(DeleteAppointmentDiseaseAsync))]
+		public async Task<ActionResult> DeleteAppointmentDiseaseAsync(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _appointmentDiseaseService.DeleteEntryAsync(id);
-				return Ok();
-			}
-			catch
-			{
-				return StatusCode(500);
-			}
+			await _appointmentDiseaseService.DeleteEntryAsync(id, cancellationToken);
+			return Ok();
 		}
 	}
 }
