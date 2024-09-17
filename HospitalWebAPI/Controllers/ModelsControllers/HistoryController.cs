@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "histories")]
 	[Route("/[controller]")]
 	public class HistoryController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var histories = await _historyService.GetAllAsync(cancellationToken);
 			return Ok(histories);
+		}
+		/// <summary>
+		/// Excel-отчет по историям болезни
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по историям болезни</remarks>
+		[HttpGet(nameof(GetHistoriesExcelFileAsync))]
+		public async Task<FileResult> GetHistoriesExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _historyService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// История болезни
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление истории болезни
 		/// </summary>
-		/// <param name="id">Id истории болезни</param>
 		/// <param name="history">История болезни</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления истории болезни</remarks>
 		[HttpPut(nameof(UpdateHistoryAsync))]
-		public async Task<ActionResult> UpdateHistoryAsync(int id, [FromBody] History history, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateHistoryAsync([FromBody] History history, CancellationToken cancellationToken)
 		{
 			var updatedHistory = await _historyService.UpdateEntryAsync(history, cancellationToken);
 			return Ok(updatedHistory);

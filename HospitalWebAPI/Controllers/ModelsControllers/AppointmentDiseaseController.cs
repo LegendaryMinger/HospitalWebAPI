@@ -3,14 +3,13 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "appointmentDiseases")]
 	[Route("/[controller]")]
 	public class AppointmentDiseaseController : Controller
-    {
+	{
 		private readonly IGenericService<AppointmentDisease> _appointmentDiseaseService;
 		public AppointmentDiseaseController(IGenericService<AppointmentDisease> appointmentDiseaseService)
 		{
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var appointmentDiseases = await _appointmentDiseaseService.GetAllAsync(cancellationToken);
 			return Ok(appointmentDiseases);
+		}
+		/// <summary>
+		/// Excel-отчет по данным из AppointmentDisease
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по данным из AppointmentDisease</remarks>
+		[HttpGet(nameof(GetAppointmentDiseasesExcelFileAsync))]
+		public async Task<FileResult> GetAppointmentDiseasesExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _appointmentDiseaseService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Запись из AppointmentDisease
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление записи из AppointmentDisease
 		/// </summary>
-		/// <param name="id">Id записи из AppointmentDisease</param>
 		/// <param name="appointmentDisease">Запись на прием</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления записи из AppointmentDisease</remarks>
 		[HttpPut(nameof(UpdateAppointmentDiseaseAsync))]
-		public async Task<ActionResult> UpdateAppointmentDiseaseAsync(int id, [FromBody] AppointmentDisease appointmentDisease, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateAppointmentDiseaseAsync([FromBody] AppointmentDisease appointmentDisease, CancellationToken cancellationToken)
 		{
 			var updatedAppointmentDisease = await _appointmentDiseaseService.UpdateEntryAsync(appointmentDisease, cancellationToken);
 			return Ok(updatedAppointmentDisease);

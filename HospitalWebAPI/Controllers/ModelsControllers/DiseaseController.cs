@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "diseases")]
 	[Route("/[controller]")]
 	public class DiseaseController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var diseases = await _diseaseService.GetAllAsync(cancellationToken);
 			return Ok(diseases);
+		}
+		/// <summary>
+		/// Excel-отчет по болезням
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по болезням</remarks>
+		[HttpGet(nameof(GetDiseasesExcelFileAsync))]
+		public async Task<FileResult> GetDiseasesExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _diseaseService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Болезнь
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление болезни
 		/// </summary>
-		/// <param name="id">Id болезни</param>
 		/// <param name="disease">Болезнь</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления болезни</remarks>
 		[HttpPut(nameof(UpdateDiseaseAsync))]
-		public async Task<ActionResult> UpdateDiseaseAsync(int id, [FromBody] Disease disease, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateDiseaseAsync([FromBody] Disease disease, CancellationToken cancellationToken)
 		{
 			var updatedDisease = await _diseaseService.UpdateEntryAsync(disease, cancellationToken);
 			return Ok(updatedDisease);

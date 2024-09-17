@@ -1,19 +1,9 @@
-﻿using HospitalWebAPI.Services;
-using HospitalWebAPI.Contexts;
-using HospitalWebAPI.Interfaces;
+﻿using HospitalWebAPI.Interfaces;
 using HospitalWebAPI.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace HospitalWebAPI.Controllers
 {
-	[ApiController]
 	[Route("/[controller]")]
 	public class UserController : Controller
 	{

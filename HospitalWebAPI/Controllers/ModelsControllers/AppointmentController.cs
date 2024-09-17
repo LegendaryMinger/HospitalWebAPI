@@ -1,15 +1,11 @@
-﻿using HospitalWebAPI.Contexts;
-using HospitalWebAPI.Interfaces;
+﻿using HospitalWebAPI.Interfaces;
 using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "appointments")]
 	[Route("/[controller]")]
 	public class AppointmentController : Controller
@@ -29,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var appointments = await _appointmentService.GetAllAsync(cancellationToken);
 			return Ok(appointments);
+		}
+		/// <summary>
+		/// Excel-отчет по записям на прием
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по записям на прием</remarks>
+		[HttpGet(nameof(GetAppointmentsExcelFileAsync))]
+		public async Task<FileResult> GetAppointmentsExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _appointmentService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Запись на прием
@@ -57,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление записи на прием
 		/// </summary>
-		/// <param name="id">Id записи на прием</param>
 		/// <param name="appointment">Запись на прием</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления записи на прием</remarks>
 		[HttpPut(nameof(UpdateAppointmentAsync))]
-		public async Task<ActionResult> UpdateAppointmentAsync(int id, [FromBody] Appointment appointment, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateAppointmentAsync([FromBody] Appointment appointment, CancellationToken cancellationToken)
 		{
 			var updatedAppointment = await _appointmentService.UpdateEntryAsync(appointment, cancellationToken);
 			return Ok(updatedAppointment);

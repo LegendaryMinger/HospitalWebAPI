@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "genders")]
 	[Route("/[controller]")]
 	public class GenderController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var genders = await _genderService.GetAllAsync(cancellationToken);
 			return Ok(genders);
+		}
+		/// <summary>
+		/// Excel-отчет по полам
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по полам</remarks>
+		[HttpGet(nameof(GetGendersExcelFileAsync))]
+		public async Task<FileResult> GetGendersExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _genderService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Пол
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление пола
 		/// </summary>
-		/// <param name="id">Id пола</param>
 		/// <param name="gender">Пол</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления пола</remarks>
 		[HttpPut(nameof(UpdateGenderAsync))]
-		public async Task<ActionResult> UpdateGenderAsync(int id, [FromBody] Gender gender, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateGenderAsync([FromBody] Gender gender, CancellationToken cancellationToken)
 		{
 			var updatedGender = await _genderService.UpdateEntryAsync(gender, cancellationToken);
 			return Ok(updatedGender);

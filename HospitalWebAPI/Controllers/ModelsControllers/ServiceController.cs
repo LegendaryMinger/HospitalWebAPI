@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "services")]
 	[Route("/[controller]")]
 	public class ServiceController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var services = await _serviceService.GetAllAsync(cancellationToken);
 			return Ok(services);
+		}
+		/// <summary>
+		/// Excel-отчет по услугам
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по услугам</remarks>
+		[HttpGet(nameof(GetServicesExcelFileAsync))]
+		public async Task<FileResult> GetServicesExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _serviceService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Услуга
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление услуги
 		/// </summary>
-		/// <param name="id">Id услуги</param>
 		/// <param name="service">Услуга</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления услуги</remarks>
 		[HttpPut(nameof(UpdateServiceAsync))]
-		public async Task<ActionResult> UpdateServiceAsync(int id, [FromBody] Service service, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateServiceAsync([FromBody] Service service, CancellationToken cancellationToken)
 		{
 			var updatedService = await _serviceService.UpdateEntryAsync(service, cancellationToken);
 			return Ok(updatedService);

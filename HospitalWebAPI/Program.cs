@@ -31,6 +31,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IGlobalService, GlobalService>();
+
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -52,84 +54,17 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-	c.SwaggerDoc("appointments", new Microsoft.OpenApi.Models.OpenApiInfo
+	var swaggerDocs = builder.Configuration.GetSection("Swagger:Docs").Get<List<DocsConfig>>();
+	foreach (var doc in swaggerDocs)
 	{
-		Version = "appointments",
-		Title = "Hospital Web API (Appointments)",
-		Description = "API для управления информацией о записях на прием"
-	});
-	c.SwaggerDoc("appointmentDiseases", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "appointmentDiseases",
-		Title = "Hospital Web API (AppointmentDiseases)",
-		Description = "API для управления информацией из сущности, которая связывает между собой Appointment и Disease"
-	});
-	c.SwaggerDoc("comments", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "comments",
-		Title = "Hospital Web API (Comments)",
-		Description = "API для управления информацией о комментариях"
-	});
-	c.SwaggerDoc("departments", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "departments",
-		Title = "Hospital Web API (Departments)",
-		Description = "API для управления информацией об отделениях"
-	});
-	c.SwaggerDoc("diseases", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "diseases",
-		Title = "Hospital Web API (Diseases)",
-		Description = "API для управления информацией о болезнях"
-	});
-	c.SwaggerDoc("employees", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "employees",
-		Title = "Hospital Web API (Employees)",
-		Description = "API для управления информацией о сотрудниках"
-	});
-	c.SwaggerDoc("equipment", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "equipment",
-		Title = "Hospital Web API (Equipment)",
-		Description = "API для управления информацией об оборудовании"
-	});
-	c.SwaggerDoc("genders", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "genders",
-		Title = "Hospital Web API (Genders)",
-		Description = "API для управления информацией о полах"
-	});
-	c.SwaggerDoc("histories", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "histories",
-		Title = "Hospital Web API (Histories)",
-		Description = "API для управления информацией об историях болезни"
-	});
-	c.SwaggerDoc("instructions", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "instructions",
-		Title = "Hospital Web API (Instructions)",
-		Description = "API для управления информацией о медицинских инструкциях"
-	});
-	c.SwaggerDoc("patients", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "patients",
-		Title = "Hospital Web API (Patients)",
-		Description = "API для управления информацией о пациентах"
-	});
-	c.SwaggerDoc("payments", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "payments",
-		Title = "Hospital Web API (Payments)",
-		Description = "API для управления информацией о платежах"
-	});
-	c.SwaggerDoc("services", new Microsoft.OpenApi.Models.OpenApiInfo
-	{
-		Version = "services",
-		Title = "Hospital Web API (Services)",
-		Description = "API для управления информацией об услугах"
-	});
+		c.SwaggerDoc(doc.Name, new OpenApiInfo
+		{
+			Version = doc.Version,
+			Title = doc.Title,
+			Description = doc.Description
+		});
+	}
+
 	c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	{
 		Type = SecuritySchemeType.Http,
@@ -139,6 +74,7 @@ builder.Services.AddSwaggerGen(c =>
 		Name = "Authorization",
 		Description = "Введите 'Bearer' [пробел] и затем ваш токен в это поле."
 	});
+
 	c.AddSecurityRequirement(new OpenApiSecurityRequirement
 	{
 		{
@@ -155,7 +91,6 @@ builder.Services.AddSwaggerGen(c =>
 	});
 
 	var xmlDocFilePath = Path.Combine(AppContext.BaseDirectory, "HospitalWebAPI.xml");
-
 	c.IncludeXmlComments(xmlDocFilePath);
 });
 
@@ -179,6 +114,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseStatusCodePages();
 
 app.UseAuthorization();
 

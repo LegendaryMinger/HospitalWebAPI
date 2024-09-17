@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "comments")]
 	[Route("/[controller]")]
 	public class CommentController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var comments = await _commentService.GetAllAsync(cancellationToken);
 			return Ok(comments);
+		}
+		/// <summary>
+		/// Excel-отчет по комментариям
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по комментариям</remarks>
+		[HttpGet(nameof(GetCommentsExcelFileAsync))]
+		public async Task<FileResult> GetCommentsExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _commentService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Комментарий
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление комментария
 		/// </summary>
-		/// <param name="id">Id комментария</param>
 		/// <param name="comment">Комментарий</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления комментария</remarks>
 		[HttpPut(nameof(UpdateCommentAsync))]
-		public async Task<ActionResult> UpdateCommentAsync(int id, [FromBody] Comment comment, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateCommentAsync([FromBody] Comment comment, CancellationToken cancellationToken)
 		{
 			var updatedComment = await _commentService.UpdateEntryAsync(comment, cancellationToken);
 			return Ok(updatedComment);

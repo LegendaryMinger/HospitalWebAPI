@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "instructions")]
 	[Route("/[controller]")]
 	public class InstructionController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var instructions = await _instructionService.GetAllAsync(cancellationToken);
 			return Ok(instructions);
+		}
+		/// <summary>
+		/// Excel-отчет по медицинским инструкциям
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по медицинским инструкциям</remarks>
+		[HttpGet(nameof(GetInstructionsExcelFileAsync))]
+		public async Task<FileResult> GetInstructionsExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _instructionService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Медицинская инструкция
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление медицинской инструкции
 		/// </summary>
-		/// <param name="id">Id медицинской инструкции</param>
 		/// <param name="instruction">Медицинская инструкция</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления медицинской инструкции</remarks>
 		[HttpPut(nameof(UpdateInstructionAsync))]
-		public async Task<ActionResult> UpdateInstructionAsync(int id, [FromBody] Instruction instruction, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateInstructionAsync([FromBody] Instruction instruction, CancellationToken cancellationToken)
 		{
 			var updatedInstruction = await _instructionService.UpdateEntryAsync(instruction, cancellationToken);
 			return Ok(updatedInstruction);

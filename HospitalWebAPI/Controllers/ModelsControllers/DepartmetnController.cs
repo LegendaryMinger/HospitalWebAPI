@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "departments")]
 	[Route("/[controller]")]
 	public class DepartmentController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var departments = await _departmentService.GetAllAsync(cancellationToken);
 			return Ok(departments);
+		}
+		/// <summary>
+		/// Excel-отчет по отделениям
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по отделениям</remarks>
+		[HttpGet(nameof(GetDepartmentsExcelFileAsync))]
+		public async Task<FileResult> GetDepartmentsExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _departmentService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Отделение
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление отделения
 		/// </summary>
-		/// <param name="id">Id отделения</param>
 		/// <param name="department">Запись на прием</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления отделения</remarks>
 		[HttpPut(nameof(UpdateDepartmentAsync))]
-		public async Task<ActionResult> UpdateDepartmentAsync(int id, [FromBody] Department department, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateDepartmentAsync([FromBody] Department department, CancellationToken cancellationToken)
 		{
 			var updatedDepartment = await _departmentService.UpdateEntryAsync(department, cancellationToken);
 			return Ok(updatedDepartment);

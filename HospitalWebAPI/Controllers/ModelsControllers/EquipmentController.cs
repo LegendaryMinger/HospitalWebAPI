@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "equipment")]
 	[Route("/[controller]")]
 	public class EquipmentController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var allEquipment = await _equipmentService.GetAllAsync(cancellationToken);
 			return Ok(allEquipment);
+		}
+		/// <summary>
+		/// Excel-отчет по оборудованию
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по оборудованию</remarks>
+		[HttpGet(nameof(GetEquipmentExcelFileAsync))]
+		public async Task<FileResult> GetEquipmentExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _equipmentService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Оборудование
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление оборудования
 		/// </summary>
-		/// <param name="id">Id оборудования</param>
 		/// <param name="equipment">Оборудование</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления оборудования</remarks>
 		[HttpPut(nameof(UpdateEquipmentAsync))]
-		public async Task<ActionResult> UpdateEquipmentAsync(int id, [FromBody] Equipment equipment, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateEquipmentAsync([FromBody] Equipment equipment, CancellationToken cancellationToken)
 		{
 			var updatedEquipment = await _equipmentService.UpdateEntryAsync(equipment, cancellationToken);
 			return Ok(updatedEquipment);

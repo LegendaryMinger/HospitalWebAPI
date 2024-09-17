@@ -3,10 +3,9 @@ using HospitalWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HospitalWebAPI.Controllers
+namespace HospitalWebAPI.Controllers.ModelsControllers
 {
 	[Authorize]
-	[ApiController]
 	[ApiExplorerSettings(GroupName = "employees")]
 	[Route("/[controller]")]
 	public class EmployeeController : Controller
@@ -26,6 +25,18 @@ namespace HospitalWebAPI.Controllers
 		{
 			var employees = await _employeeService.GetAllAsync(cancellationToken);
 			return Ok(employees);
+		}
+		/// <summary>
+		/// Excel-отчет по сотрудникам
+		/// </summary>
+		/// <param name="cancellationToken">Токен отмены</param>
+		/// <returns></returns>
+		/// <remarks>Запрос для получения Excel-файла по сотрудникам</remarks>
+		[HttpGet(nameof(GetEmployeesExcelFileAsync))]
+		public async Task<FileResult> GetEmployeesExcelFileAsync(CancellationToken cancellationToken)
+		{
+			var xlFile = await _employeeService.GetAllExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 		/// <summary>
 		/// Сотрудник
@@ -54,12 +65,11 @@ namespace HospitalWebAPI.Controllers
 		/// <summary>
 		/// Обновление сотрудника
 		/// </summary>
-		/// <param name="id">Id сотрудника</param>
 		/// <param name="employee">Сотрудник</param>
 		/// <param name="cancellationToken">Токен отмены</param>
 		/// <remarks>Запрос для обновления сотрудника</remarks>
 		[HttpPut(nameof(UpdateEmployeeAsync))]
-		public async Task<ActionResult> UpdateEmployeeAsync(int id, [FromBody] Employee employee, CancellationToken cancellationToken)
+		public async Task<ActionResult> UpdateEmployeeAsync([FromBody] Employee employee, CancellationToken cancellationToken)
 		{
 			var updatedEmployee = await _employeeService.UpdateEntryAsync(employee, cancellationToken);
 			return Ok(updatedEmployee);

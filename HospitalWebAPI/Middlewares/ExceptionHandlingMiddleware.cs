@@ -1,4 +1,5 @@
 ﻿using HospitalWebAPI.Classes;
+using HospitalWebAPI.Middlewares.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 using System.Security;
@@ -21,22 +22,34 @@ namespace HospitalWebAPI.Middlewares
 			{
 				await _next(httpContext);
 			}
-			catch (UnauthorizedAccessException ex)
-			{
-				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.Unauthorized, "Invalid login or password");
-			}
-			catch (BadHttpRequestException ex)
-			{
-				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.Unauthorized, "Bad request");
-			}
+			// Общие исключения
 			catch (ArgumentNullException ex)
 			{
-				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.BadRequest, "Some fields may be NULL");
+				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.BadRequest, "Some arguments are NULL");
 			}
-			catch (SecurityException ex)
+			catch (ArgumentException ex)
+			{
+				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.BadRequest, "Some arguments are missing or contain invalid values");
+			}
+			// Исключения генерации Excel-документов
+			catch (EntryIsNullException ex)
+			{
+				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.Conflict, "List of this entries is NULL");
+			}
+			// Исключения авторизации и регистрации
+			catch (AuthorizationException ex)
+			{
+				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.Conflict, "Invalid login or password");
+			}
+			catch (UserArleadyExistsException ex)
 			{
 				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.Conflict, "User arleady exists");
 			}
+			catch (PasswordConfirmationException ex)
+			{
+				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.Conflict, "Passwords do not match");
+			}
+			// Глобальное исключение
 			catch (Exception ex)
 			{
 				await HandleExceptionAsync(httpContext, ex.Message, HttpStatusCode.InternalServerError, "Internal server error");
