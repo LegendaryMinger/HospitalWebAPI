@@ -36,14 +36,6 @@ builder.Services.AddScoped<IGlobalService, GlobalService>();
 
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
-builder.Services.AddAutoMapper(typeof(Program));
-
-var mapperConfig = new MapperConfiguration(options =>
-{
-	options.AddProfile<MappingProfile>();
-});
-
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
 	var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtConfig>();

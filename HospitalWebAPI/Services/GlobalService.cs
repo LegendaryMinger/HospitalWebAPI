@@ -10,11 +10,9 @@ namespace HospitalWebAPI.Services
 	public class GlobalService : IGlobalService
 	{
 		private readonly HospitalContext _context;
-		private readonly IMapper _mapper;
-		public GlobalService(HospitalContext context, IMapper mapper)
+		public GlobalService(HospitalContext context)
 		{
 			_context = context;
-			_mapper = mapper;
 		}
 		public async Task<XLWorkbookFile> GetGlobalExcelFileAsync(CancellationToken cancellationToken)
 		{
