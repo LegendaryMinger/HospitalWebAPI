@@ -29,18 +29,11 @@ namespace HospitalWebAPI.Services
 		}
 		public async Task<XLWorkbookFile> GetAllExcelFileAsync(CancellationToken cancellationToken)
 		{
-			var entriesList = await _dbSet.ToListAsync();
+			var entriesList = await _dbSet.ToListAsync(cancellationToken);
 			if (entriesList.Count == 0)
 				throw new EntryIsNullException();
 
-			XLWorkbookFile xlEntryFile = new XLWorkbookFile() 
-			{ 
-				File = XLWorkbookFile.CreateXLFileSingleEntry(entriesList), 
-				ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-				FileName = $"{typeof(T).Name}-{DateTime.Now}.xlsx" 
-			};
-
-			return xlEntryFile;
+			return XLWorkbookFile.CreateXLFileSingleEntry(entriesList);
 		}
 		public async Task<T> GetEntryByIdAsync(int id, CancellationToken cancellationToken)
 		{

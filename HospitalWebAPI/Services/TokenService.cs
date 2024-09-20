@@ -17,7 +17,18 @@ namespace HospitalWebAPI.Services
 		}
 		public string GetToken(string login)
 		{
-			return _jwtConfg.GenerateToken(login);
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var key = Encoding.ASCII.GetBytes(_jwtConfg.Key);
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.Name, login) }),
+				Expires = DateTime.UtcNow.AddHours(_jwtConfg.Expires),
+				Issuer = _jwtConfg.Issuer,
+				Audience = _jwtConfg.Audience,
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+			};
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return tokenHandler.WriteToken(token);
 		}
 	}
 }

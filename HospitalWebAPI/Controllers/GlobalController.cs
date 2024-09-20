@@ -22,8 +22,8 @@ namespace HospitalWebAPI.Controllers
 		[HttpGet(nameof(GetGlobalExcelFileAsync))]
 		public async Task<FileResult> GetGlobalExcelFileAsync(CancellationToken cancellationToken)
 		{
-			var file = await _globalService.GetGlobalExcelFileAsync(cancellationToken);
-			return File(file.File.ToArray(), file.ContentType, file.FileName);
+			var xlFile = await _globalService.GetGlobalExcelFileAsync(cancellationToken);
+			return File(xlFile.File.ToArray(), xlFile.ContentType, xlFile.FileName);
 		}
 	}
 }

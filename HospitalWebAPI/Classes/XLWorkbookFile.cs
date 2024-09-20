@@ -9,7 +9,7 @@ namespace HospitalWebAPI.Classes
 		public MemoryStream File {  get; set; }
 		public string ContentType { get; set; }
 		public string FileName { get; set; }
-		public static MemoryStream CreateXLFileSingleEntry<T>(List<T> entriesList)
+		public static XLWorkbookFile CreateXLFileSingleEntry<T>(List<T> entriesList)
 		{
 			var xlWorkbook = new XLWorkbook();
 			AddXLWorksheet(entriesList, xlWorkbook);
@@ -17,13 +17,18 @@ namespace HospitalWebAPI.Classes
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				xlWorkbook.SaveAs(memoryStream);
-				return memoryStream;
+				XLWorkbookFile xlEntryFile = new XLWorkbookFile()
+				{
+					File = memoryStream,
+					ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+					FileName = $"{typeof(T)}-{DateTime.Now}.xlsx"
+				};
+				return xlEntryFile;
 			}
 		}
-		public static MemoryStream CreateXLFileGlobalEntries<T>(List<List<T>> multipleEntriesList)
+		public static XLWorkbookFile CreateXLFileGlobalEntries<T>(List<List<T>> multipleEntriesList)
 		{
 			var xlWorkbook = new XLWorkbook();
-
 			foreach (var entriesList in multipleEntriesList)
 			{
 				if (entriesList == null)
@@ -34,7 +39,13 @@ namespace HospitalWebAPI.Classes
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				xlWorkbook.SaveAs(memoryStream);
-				return memoryStream;
+				XLWorkbookFile xlMultipleEntritsFile = new XLWorkbookFile()
+				{
+					File = memoryStream,
+					ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+					FileName = $"Global-{DateTime.Now}.xlsx"
+				};
+				return xlMultipleEntritsFile;
 			}
 		}
 		public static void AddXLWorksheet<T>(List<T> entriesList, XLWorkbook xlWorkbook)

@@ -13,6 +13,7 @@ using HospitalWebAPI.Models;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using HospitalWebAPI.Middlewares;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,14 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IGlobalService, GlobalService>();
 
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+
+builder.Services.AddAutoMapper(typeof(Program));
+
+var mapperConfig = new MapperConfiguration(options =>
+{
+	options.AddProfile<MappingProfile>();
+});
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -114,7 +123,6 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseStatusCodePages();
 
 app.UseAuthorization();
 
